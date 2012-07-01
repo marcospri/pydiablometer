@@ -1,8 +1,9 @@
+import sys
 import pyHook
 import pythoncom
 import Queue as queue
 
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, freeze_support
 
 from PySide.QtCore import QThread, Signal
 from PySide.QtUiTools import QUiLoader
@@ -78,8 +79,8 @@ class MainWindow(QtGui.QMainWindow):
             mainWindow = loader.load(file, self)
             file.close()
         except:
-            self.warning_message("Error loading file", "An error occurred while loading a UI definition file")
-            exit()
+            self.warning_message("Error", "Can't find widgets definition file.\nIs the widgets folder in the same path as the executable?")
+            sys.exit()
 
         #Reference to the components
         self.left_click_lcd = mainWindow.findChild(QLCDNumber, "left_click_lcd")
@@ -133,9 +134,12 @@ class MainWindow(QtGui.QMainWindow):
             lcd = self.action_keys_lcds[self.key_maps.index(key)]
             lcd.display(lcd.value() + 1)
 
+    def warning_message(self, title, message):
+        QtGui.QMessageBox.warning(self, title, message, QtGui.QMessageBox.Ok)
+
 
 if __name__ == '__main__':
-    import sys
+    freeze_support()
 
     app = QtGui.QApplication(sys.argv)
     window = MainWindow()
